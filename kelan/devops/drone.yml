@@ -1,0 +1,85 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: drone
+spec:
+  selector:
+    app: drone
+  ports:
+  - name: www
+    port: 3281
+    targetPort: 8000
+  externalIPs:
+  - 192.168.13.40
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: drone
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: drone
+        version: "0.8"
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: 192.168.13.42
+      containers:
+      - name: drone-server
+        image: registry.ispacesys.cn/public/drone:0.8
+        ports:
+        - containerPort: 8000
+        - containerPort: 9000
+        volumeMounts:
+        - name: sqlite
+          mountPath: /var/lib/drone
+        - name: src
+          mountPath: /drone/src
+        securityContext:
+          privileged: true          
+        env:
+        - name: DRONE_OPEN
+          value: "true"
+        - name: DRONE_ADMIN
+          value: "root"          
+        - name: DRONE_HOST
+          value: k8s.ct.csii.com.cn:13281
+        - name: DRONE_GITLAB
+          value: "true"
+        - name: DRONE_GITLAB_CLIENT
+          value: 5455fd417a69d2aadb1b500a45365cbdecdd497e571b56e3e6b9a81c515f51da
+        - name: DRONE_GITLAB_SECRET
+          value: 9c2adaaced582a4baa48ea7e66f5366ad6d78862b97591f4c8b00269d0926f6d
+        - name: DRONE_GITLAB_URL
+          value: https://gitlab.ct.csii.com.cn
+        - name: DRONE_GITLAB_GIT_USERNAME
+          value: docker
+        - name: DRONE_GITLAB_GIT_PASSWORD
+          value: "abc2018"
+        - name: DRONE_SECRET
+          value: passwddrone
+      - name: drone-agent
+        image: registry.ispacesys.cn/public/drone-agent:0.8
+        volumeMounts:
+        - name: docker
+          mountPath: /var/run/docker.sock
+        securityContext:
+          privileged: true
+        env:
+        - name: DRONE_SERVER
+          value: localhost:9000
+        - name: DRONE_SECRET
+          value: passwddrone      
+      volumes:      
+      - name: sqlite
+        hostPath:
+          path: /data/work/drone/db
+      - name: src
+        hostPath:
+          path: /data/work/drone/src
+      - name: docker
+        hostPath:
+          path: /var/run/docker.sock

@@ -1,0 +1,248 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gitlab-ssh
+  labels:
+    app: gitlab
+spec:
+  selector:
+    app: gitlab
+  ports:
+  - name: gitlab-ssh
+    port: 10022
+    targetPort: 22
+    protocol: TCP
+  externalIPs:
+  - 192.168.13.40
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gitlab
+  labels:
+    app: gitlab
+spec:
+  selector:
+    app: gitlab
+  ports:
+  - name: gitlab-www
+    port: 80
+    targetPort: 80
+    protocol: TCP
+  - name: gitlab-ssh
+    port: 22
+    targetPort: 22
+    protocol: TCP
+  - name: postgresql
+    port: 5432
+    targetPort: 5432
+    protocol: TCP
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: gitlab
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: gitlab
+        version: 10.2.2
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: 192.168.13.42
+      containers:
+      - name: redis
+        image: registry.ispacesys.cn/public/redis:2.8.4
+        resources:
+          limits:
+            cpu: 200m
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        volumeMounts:
+        - name: redis-data
+          mountPath: /var/lib/redis
+      - name: postgresql
+        image: registry.ispacesys.cn/public/postgresql:9.6-2
+        resources:
+          limits:
+            cpu: 200m
+            memory: 500Mi
+          requests:
+            cpu: 100m
+            memory: 300Mi
+        env:
+        - name: DB_USER
+          value: gitlab
+        - name: DB_PASS
+          value: password
+        - name: DB_NAME
+          value: gitlabhq_production
+        - name: DB_EXTENSION
+          value: pg_trgm
+        volumeMounts:
+        - name: postgresql-data
+          mountPath: /var/lib/postgresql
+        ports:
+        - containerPort: 5432
+          name: postgresql
+      - name: gitlab
+        image: registry.ispacesys.cn/public/gitlab:10.2.2
+        resources:
+          limits:
+            cpu: 600m
+            memory: 3000Mi
+          requests:
+            cpu: 500m
+            memory: 2000Mi
+        ports:
+        - containerPort: 80
+          name: gitlab-www
+        - containerPort: 22
+          name: gitlab-ssh
+        volumeMounts:
+        - name: gitlab-data
+          mountPath: /home/git/data
+        env:
+        - name: DEBUG
+          value: "false"
+        - name: DB_ADAPTER
+          value: postgresql
+        - name: DB_HOST
+          value: localhost
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_USER
+          value: gitlab
+        - name: DB_PASS
+          value: password
+        - name: DB_NAME
+          value: gitlabhq_production
+
+        - name: REDIS_HOST
+          value: localhost
+        - name: REDIS_PORT
+          value: "6379"
+
+        - name: TZ
+          value: Asia/Beijing
+        - name: GITLAB_TIMEZONE
+          value: Beijing
+        
+        - name: GITLAB_HTTPS
+          value: "true"
+        - name: SSL_SELF_SIGNED
+          value: "false"
+
+        - name: GITLAB_HOST
+          value: gitlab.ct.csii.com.cn
+        - name: GITLAB_PORT
+          value: "443"
+        - name: GITLAB_SSH_PORT
+          value: "10022"
+        - name: GITLAB_SECRETS_DB_KEY_BASE
+          value: "M7VrtgxmhTCVfLPPdCKXFKXrsJcC4bwphrkbx44NcJJkdK7jr9Fq9XxfrrwddbHR"
+        - name: GITLAB_SECRETS_SECRET_KEY_BASE
+          value: "3dbKvRTXxTnrFXt4P7fwhfxRRHgXmbtr7sVszXF7FXKqdtMfnRmMmtXbRmrTpfpL"
+        - name: GITLAB_SECRETS_OTP_KEY_BASE
+          value: "cvF9pvcq3CJ974jzNbpdrv4dKxrNkRJdKv7K4rX97HpxfmczqzqbtVcmHbWJbKbr"
+
+        - name: GITLAB_ROOT_PASSWORD
+          value: openstack40@Csii
+        - name: GITLAB_ROOT_EMAIL
+          value: shucheng@spacesystech.com
+
+        - name: GITLAB_NOTIFY_ON_BROKEN_BUILDS
+          value: "true"
+        - name: GITLAB_NOTIFY_PUSHER
+          value: "false"
+
+        - name: GITLAB_EMAIL
+          value: shucheng@spacesystech.com
+        - name: GITLAB_EMAIL_REPLY_TO
+          value: shucheng@spacesystech.com
+        - name: GITLAB_INCOMING_EMAIL_ADDRESS
+          value: shucheng@spacesystech.com
+
+        - name: GITLAB_BACKUP_SCHEDULE
+          value: daily
+        - name: GITLAB_BACKUP_TIME
+          value: 01:00
+        - name: SMTP_ENABLED
+          value: "true"
+        - name: SMTP_DOMAIN
+          value: www.spacesystech.com
+        - name: SMTP_HOST
+          value: smtp.spacesystech.com
+        - name: SMTP_PORT
+          value: "25"
+        - name: SMTP_USER
+          value: shucheng@spacesystech.com
+        - name: SMTP_PASS
+          value: xxxxxxxxxpassword
+        - name: SMTP_STARTTLS
+          value: "false"
+        - name: SMTP_AUTHENTICATION
+          value: login
+
+        - name: IMAP_ENABLED
+          value: "false"
+        - name: IMAP_HOST
+          value: imap.gmail.com
+        - name: IMAP_PORT
+          value: "993"
+        - name: IMAP_USER
+          value: mailer@example.com
+        - name: IMAP_PASS
+          value: password
+        - name: IMAP_SSL
+          value: "true"
+        - name: IMAP_STARTTLS
+          value: "false"
+
+        - name: OAUTH_ENABLED
+          value: "false"
+        - name: OAUTH_BLOCK_AUTO_CREATED_USERS
+          value: "true"
+        - name: OAUTH_AUTO_LINK_LDAP_USER
+          value: "false"
+        - name: OAUTH_AUTO_LINK_SAML_USER
+          value: "false"
+
+        - name: OAUTH_CAS3_LABEL
+          value: cas3
+        - name: OAUTH_CAS3_DISABLE_SSL_VERIFICATION
+          value: "false"
+        - name: OAUTH_CAS3_LOGIN_URL
+          value: /cas/login
+        - name: OAUTH_CAS3_VALIDATE_URL
+          value: /cas/p3/serviceValidate
+        - name: OAUTH_CAS3_LOGOUT_URL
+          value: /cas/logout
+
+        - name: OAUTH_SAML_LABEL
+          value: Our SAML Provider
+        - name: OAUTH_SAML_NAME_IDENTIFIER_FORMAT
+          value: urn:oasis:names:tc:SAML:2.0:nameid-format:transient
+
+        - name: GITLAB_LFS_ENABLED
+          value: "true"
+        - name: GITLAB_LFS_OBJECTS_DIR
+          value: /home/git/data/lfs-objects
+      volumes:      
+      - name: localtime
+        hostPath:
+          path: /etc/localtime      
+      - name: redis-data
+        hostPath:
+          path: /data/gitlab/redis
+      - name: postgresql-data
+        hostPath:
+          path: /data/gitlab/postgresql          
+      - name: gitlab-data
+        hostPath:
+          path: /data/gitlab/gitlab

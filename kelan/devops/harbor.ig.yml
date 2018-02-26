@@ -1,0 +1,23 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: harbor
+  annotations:
+    traefik.frontend.rule.type: PathPrefix  
+spec:
+  rules:
+  - host: harbor.ct.csii.com.cn
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: harbor-ui
+          servicePort: 80
+      - path: /v2
+        backend:
+          serviceName: harbor-registry
+          servicePort: 5000        
+      - path: /service
+        backend:
+          serviceName: harbor-ui
+          servicePort: 80

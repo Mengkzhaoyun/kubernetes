@@ -1,0 +1,140 @@
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: traefik-ingress
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - services
+      - endpoints
+      - secrets
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - extensions
+    resources:
+      - ingresses
+    verbs:
+      - get
+      - list
+      - watch
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: traefik-ingress
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: traefik-ingress
+subjects:
+- kind: ServiceAccount
+  name: traefik
+  namespace: devops
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: traefik
+  namespace: devops
+---  
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: traefik
+data:
+  traefik.toml: |
+    # traefik.toml
+    defaultEntryPoints = ["http","https"]
+    [websocket]
+      protocol = "http"
+    [entryPoints]
+      [entryPoints.http]
+      address = ":80"
+      [entryPoints.https]
+      address = ":443"
+      [entryPoints.https.tls]
+        [[entryPoints.https.tls.certificates]]
+        CertFile = "/ssl/gitlab.ct.csii.com.cn.crt"
+        KeyFile = "/ssl/gitlab.ct.csii.com.cn.key"
+        [[entryPoints.https.tls.certificates]]
+        CertFile = "/ssl/harbor.ct.csii.com.cn.crt"
+        KeyFile = "/ssl/harbor.ct.csii.com.cn.key"
+    [metrics]
+      [metrics.prometheus]
+        entryPoint = "traefik"
+        buckets = [0.1,0.3,1.2,5.0]        
+    [accessLog]
+      format   = "json"
+    [api]
+      entryPoint = "traefik"
+      dashboard = true
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: traefik
+spec:
+  selector:
+    k8s-app: traefik  
+  ports:
+    - protocol: TCP
+      port: 3282
+      targetPort: 8080
+  externalIPs:
+  - 192.168.13.40
+---
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: traefik
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        k8s-app: traefik
+        name: traefik
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: 192.168.13.40
+      serviceAccountName: traefik
+      terminationGracePeriodSeconds: 60
+      volumes:
+      - name: ssl
+        secret:
+          secretName: traefik-cert
+      - name: config
+        configMap:
+          name: traefik
+      - name: localtime
+        hostPath:
+          path: /etc/localtime          
+      containers:
+      - image: registry.ispacesys.cn/public/traefik:1.5-alpine
+        name: traefik
+        volumeMounts:
+        - mountPath: "/ssl"
+          name: "ssl"
+        - mountPath: "/config"
+          name: "config"   
+        - name: localtime
+          mountPath: /etc/localtime               
+        ports:
+        - name: http
+          containerPort: 80
+          hostPort: 80
+        - name: https
+          containerPort: 443
+          hostPort: 443
+        - name: admin
+          containerPort: 8080    
+        args:
+        - --configfile=/config/traefik.toml
+        - --web
+        - --web.address=:8080
+        - --kubernetes
