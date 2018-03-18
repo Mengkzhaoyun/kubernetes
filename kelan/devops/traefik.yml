@@ -80,7 +80,7 @@ metadata:
   name: traefik
 spec:
   selector:
-    k8s-app: traefik  
+    app: traefik  
   ports:
     - protocol: TCP
       port: 3282
@@ -91,14 +91,13 @@ spec:
 kind: Deployment
 apiVersion: extensions/v1beta1
 metadata:
-  name: traefik
+  name: traefik  
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        k8s-app: traefik
-        name: traefik
+        app: traefik
     spec:
       nodeSelector:
         kubernetes.io/hostname: 192.168.13.40
@@ -118,10 +117,10 @@ spec:
       - image: registry.ispacesys.cn/public/traefik:1.5-alpine
         name: traefik
         volumeMounts:
-        - mountPath: "/ssl"
-          name: "ssl"
-        - mountPath: "/config"
-          name: "config"   
+        - mountPath: /ssl
+          name: ssl
+        - mountPath: /config
+          name: config  
         - name: localtime
           mountPath: /etc/localtime               
         ports:
