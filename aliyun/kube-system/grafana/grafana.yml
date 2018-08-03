@@ -1,0 +1,36 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: kube-system
+spec: 
+  replicas: 1
+  template: 
+    metadata: 
+      labels: 
+        k8s-app: grafana
+        version: 5.2.1
+    spec: 
+      containers: 
+        - image: registry.ispacesys.cn/k8s/grafana:5.2.1
+          name: grafana
+          resources:
+            # keep request = limit to keep this container in guaranteed class
+            limits:
+              cpu: 500m
+              memory: 500Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
+          ports: 
+          - containerPort: 3000          
+          env:
+          - name: GF_AUTH_BASIC_ENABLED
+            value: "false"
+          - name: GF_AUTH_ANONYMOUS_ENABLED
+            value: "true"
+          - name: GF_AUTH_ANONYMOUS_ORG_ROLE
+            value: Admin
+          # - name: GF_SERVER_ROOT_URL
+          #   value: /grafana/
