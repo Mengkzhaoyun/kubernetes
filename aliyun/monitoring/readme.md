@@ -35,4 +35,18 @@ docker push hub.c.163.com/mengkzhaoyun/k8s:prometheus-config-reloader-v0.20.0
 docker pull quay.io/coreos/hyperkube:v1.7.6_coreos.0 && \
 docker tag quay.io/coreos/hyperkube:v1.7.6_coreos.0 hub.c.163.com/mengkzhaoyun/k8s:hyperkube-v1.7.6_coreos.0 && \
 docker push hub.c.163.com/mengkzhaoyun/k8s:hyperkube-v1.7.6_coreos.0
+
+# quay.io/prometheus/node-exporter:v0.15.2
+docker pull quay.io/prometheus/node-exporter:v0.15.2 && \
+docker tag quay.io/prometheus/node-exporter:v0.15.2 hub.c.163.com/mengkzhaoyun/k8s:node-exporter-v0.15.2 && \
+docker push hub.c.163.com/mengkzhaoyun/k8s:node-exporter-v0.15.2
+
+# registry.cn-hangzhou.aliyuncs.com/google_containers/kube-state-metrics:v1.2.0
+docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/kube-state-metrics:v1.2.0 && \
+docker tag registry.cn-hangzhou.aliyuncs.com/google_containers/kube-state-metrics:v1.2.0  hub.c.163.com/mengkzhaoyun/k8s:kube-state-metrics-v1.2.0 && \
+docker push hub.c.163.com/mengkzhaoyun/k8s:kube-state-metrics-v1.2.0
+
+docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/addon-resizer:1.7 && \
+docker tag registry.cn-hangzhou.aliyuncs.com/google_containers/addon-resizer:1.7 hub.c.163.com/mengkzhaoyun/k8s:addon-resizer-1.7 && \
+docker push hub.c.163.com/mengkzhaoyun/k8s:addon-resizer-1.7
 ```
