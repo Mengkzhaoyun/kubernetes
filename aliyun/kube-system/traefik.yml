@@ -74,9 +74,10 @@ data:
       storage = "acme.json"
       entryPoint = "https"
       [[acme.domains]]
-        main = "*.wodcloud.com"
+        main = "wodcloud.com"
+        sans = ["k8s.wodcloud.com", "grafana.wodcloud.com"]
     [acme.httpChallenge]
-      entryPoint = "http"
+      entryPoint = "https"
 ---
 kind: Deployment
 apiVersion: extensions/v1beta1
