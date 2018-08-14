@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ .Release.NameSpace }}
+data:
+  DB_USER: gitlab
+  DB_PASS: password
+  DB_NAME: gitlabhq_production
+  DB_EXTENSION: pg_trgm
+  DEBUG: "false"
+  DB_ADAPTER: postgresql
+  DB_HOST: {{ .Release.Name }}-postgresql
+  DB_PORT: "5432"
+  REDIS_HOST: {{ .Release.Name }}-redis
+  REDIS_PORT: "6379"
+  GITLAB_TIMEZONE: Asia/Beijing
+  GITLAB_HTTPS: "true"
+  SSL_SELF_SIGNED: "false"
+  GITLAB_HOST: {{ .Values.gitlab.host }}
+  GITLAB_PORT: "443"
+  GITLAB_SSH_PORT: "{{ .Values.gitlab.sshport }}"
+  GITLAB_SECRETS_DB_KEY_BASE: "M7VrtgxmhTCVfLPPdCKXFKXrsJcC4bwphrkbx44NcJJkdK7jr9Fq9XxfrrwddbHR"
+  GITLAB_SECRETS_SECRET_KEY_BASE: "3dbKvRTXxTnrFXt4P7fwhfxRRHgXmbtr7sVszXF7FXKqdtMfnRmMmtXbRmrTpfpL"
+  GITLAB_SECRETS_OTP_KEY_BASE: "cvF9pvcq3CJ974jzNbpdrv4dKxrNkRJdKv7K4rX97HpxfmczqzqbtVcmHbWJbKbr"
+  GITLAB_ROOT_PASSWORD: "58772015"
+  GITLAB_ROOT_EMAIL: mengkzhaoyun@gmail.com
+  GITLAB_NOTIFY_ON_BROKEN_BUILDS: "true"
+  GITLAB_NOTIFY_PUSHER: "false"
+  GITLAB_BACKUP_SCHEDULE: weekly
+  GITLAB_BACKUP_TIME: 04:00
+  GITLAB_LFS_ENABLED: "true"
+  GITLAB_LFS_OBJECTS_DIR: /home/git/data/lfs-objects  
+  GITALY_CLIENT_PATH: /home/git/gitaly

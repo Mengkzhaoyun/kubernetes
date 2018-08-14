@@ -1,0 +1,47 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-postgresql
+  namespace: {{ .Release.NameSpace }}
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-postgresql
+        version: "{{ .Values.postgresql.tag }}"
+    spec:
+      containers:    
+      - name: postgresql
+        image: "{{ .Values.postgresql.repository }}:{{ .Values.postgresql.tag }}"
+        env:
+        - name: DB_USER
+          valueFrom: 
+            configMapKeyRef: 
+              name: {{ .Release.Name }}
+              key: DB_USER
+        - name: DB_PASS
+          valueFrom: 
+            configMapKeyRef: 
+              name: {{ .Release.Name }}
+              key: DB_PASS
+        - name: DB_NAME
+          valueFrom: 
+            configMapKeyRef: 
+              name: {{ .Release.Name }}
+              key: DB_NAME
+        - name: DB_EXTENSION
+          valueFrom: 
+            configMapKeyRef: 
+              name: {{ .Release.Name }}
+              key: DB_EXTENSION                                          
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/postgresql
+        ports:
+        - containerPort: 5432
+          name: postgresql
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: {{ .Release.Name }}-postgresql 

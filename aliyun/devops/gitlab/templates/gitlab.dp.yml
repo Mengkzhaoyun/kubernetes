@@ -1,0 +1,31 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ .Release.NameSpace }}
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}
+        version: {{ .Values.gitlab.tag }}
+    spec:
+      containers:  
+      - name: gitlab
+        image: "{{ .Values.gitlab.repository }}:{{ .Values.gitlab.tag }}"
+        ports:
+        - containerPort: 80
+          name: http
+        - containerPort: 22
+          name: ssh
+        volumeMounts:
+        - name: data
+          mountPath: /home/git/data        
+        envFrom:
+        - configMapRef:
+            name: {{ .Release.Name }}
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: {{ .Release.Name }}

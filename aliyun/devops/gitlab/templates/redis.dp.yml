@@ -1,0 +1,27 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-redis
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-redis
+        version: {{ .Values.redis.tag }}
+    spec:
+      containers:
+      - name: redis
+        image: "{{ .Values.redis.repository }}:{{ .Values.redis.tag }}"
+        ports:
+        - containerPort: 6379
+          name: redis 
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/redis
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: {{ .Release.Name }}-redis           

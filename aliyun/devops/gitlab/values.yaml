@@ -1,0 +1,13 @@
+gitlab:
+  repository: "registry-vpc.cn-qingdao.aliyuncs.com/wod/sameersbn-gitlab"
+  tag: "11.1.4"
+  host: "gitlab.wodcloud.com"
+  sshport: 10022
+
+postgresql:
+  repository: "registry-vpc.cn-qingdao.aliyuncs.com/wod/sameersbn-postgresql"
+  tag: "10"
+
+redis:
+  repository: "registry-vpc.cn-qingdao.aliyuncs.com/wod/sameersbn-redis"
+  tag: "4.0.9-1"
