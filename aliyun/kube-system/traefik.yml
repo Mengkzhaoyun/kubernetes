@@ -51,7 +51,7 @@ data:
   traefik.toml: |
     defaultEntryPoints = ["http","https"]
     [entryPoints.traefik]
-      address = ":8380"     
+      address = ":8380"
     [websocket]
       protocol = "http"
     [entryPoints]
@@ -63,7 +63,7 @@ data:
     [metrics]
       [metrics.prometheus]
         entryPoint = "traefik"
-        buckets = [0.1,0.3,1.2,5.0]        
+        buckets = [0.1,0.3,1.2,5.0]
     [accessLog]
       format   = "json"
     [api]
@@ -72,12 +72,12 @@ data:
     [acme]
       email = "mengkzhaoyun@gmail.com"
       storage = "acme.json"
+      onHostRule = true
       entryPoint = "https"
-      [[acme.domains]]
-        main = "wodcloud.com"
-        sans = ["k8s.wodcloud.com", "grafana.wodcloud.com"]
-    [acme.httpChallenge]
-      entryPoint = "https"
+      caServer = "https://acme-staging-v02.api.letsencrypt.org/directory"    
+      acmeLogging=true  
+      [acme.httpChallenge]
+        entryPoint = "https"    
 ---
 kind: Deployment
 apiVersion: extensions/v1beta1
@@ -95,7 +95,6 @@ spec:
     metadata:
       labels:
         k8s-app: traefik
-        name: traefik
     spec:
       serviceAccountName: traefik
       nodeSelector:
@@ -104,13 +103,23 @@ spec:
       volumes:
       - name: config
         configMap:
-          name: traefik-conf    
+          name: traefik-conf
+      - name: acme
+        hostPath:
+            path: /data/kube-system/traefik/acme.json
+      - name: etc-localtime
+        hostPath:
+          path: /etc/localtime
       containers:
-      - image: hub.c.163.com/mengkzhaoyun/public:traefik-1.6.5-alpine
+      - image: registry-vpc.cn-qingdao.aliyuncs.com/wod/traefik:v1.7.0-rc3-alpine
         name: traefik
         volumeMounts:
-        - mountPath: "/config"
-          name: "config"
+        - name: config
+          mountPath: /config
+        - name: acme
+          mountPath: /acme.json
+        - name: etc-localtime
+          mountPath: /etc/localtime
         ports:
         - containerPort: 443
           hostPort: 443
@@ -120,7 +129,7 @@ spec:
           name: http
         - containerPort: 8380
           hostPort: 8380
-          name: admin           
+          name: admin
         args:
         - --configfile=/config/traefik.toml
         - --kubernetes
