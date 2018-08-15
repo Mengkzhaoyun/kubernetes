@@ -14,7 +14,7 @@ data:
   DB_PORT: "5432"
   REDIS_HOST: {{ .Release.Name }}-redis
   REDIS_PORT: "6379"
-  GITLAB_TIMEZONE: Asia/Beijing
+  GITLAB_TIMEZONE: Asia/Shanghai
   GITLAB_HTTPS: "true"
   SSL_SELF_SIGNED: "false"
   GITLAB_HOST: {{ .Values.gitlab.host }}
