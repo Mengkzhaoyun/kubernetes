@@ -26,4 +26,8 @@ helm install . --name gitlab --namespace devops
 
 # 3. Uninstall Gitlab
 helm del --purge gitlab
+
+# 4. template
+cd C:\Go\src\github.com\mengkzhaoyun\kubernetes\aliyun\devops\gitlab ;`
+helm template . --name gitlab --namespace devops >> ./dist/gitlab.yml
 ```
