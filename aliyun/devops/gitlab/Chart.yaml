@@ -1,0 +1,14 @@
+name: gitlab
+version: 11.1.4
+description: gitlab
+appVersion: 11.1.4
+apiVersion: v1
+keywords:
+- gitlab
+home: https://github.com/sameersbn/docker-gitlab
+icon: https://about.gitlab.com/images/comparison/gitlab-logo.svg
+sources:
+- https://github.com/sameersbn/docker-gitlab
+maintainers:
+- name: mengkzhaoyun
+  email: mengkzhaoyun@gmail.com
