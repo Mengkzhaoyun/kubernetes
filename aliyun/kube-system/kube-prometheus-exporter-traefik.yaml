@@ -1,0 +1,26 @@
+---
+# Source: kube-prometheus-exporter-traefik/templates/servicemonitor.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata: 
+  name: kube-prometheus-exporter-traefik
+  namespace: monitoring
+  labels:
+    app: exporter-traefik  
+    component: traefik-exporter
+    heritage: Tiller
+    prometheus: kube-prometheus
+    release: kube-prometheus     
+spec:
+  jobLabel: component
+  selector:
+    matchLabels:
+      app: exporter-traefik
+      component: traefik-exporter
+  namespaceSelector:
+    matchNames:
+      - "kube-system"
+  endpoints:
+  - port: http-metrics
+    interval: 15s
+    bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token

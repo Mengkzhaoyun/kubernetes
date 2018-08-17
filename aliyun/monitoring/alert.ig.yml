@@ -2,14 +2,14 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: kube-prometheus
+  name: kube-prometheus-alertmanager
   namespace: monitoring
 spec:
   rules:
-  - host: prometheus.wodcloud.com
+  - host: alertmanager.wodcloud.com
     http:
       paths:
       - path: /
         backend:
-          serviceName: kube-prometheus
-          servicePort: 9090
+          serviceName: kube-prometheus-alertmanager
+          servicePort: 9093

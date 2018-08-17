@@ -1,0 +1,19 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: kube-prometheus-exporter-traefik
+  namespace: kube-system
+  labels:
+    app: exporter-traefik  
+    component: traefik-exporter
+spec:
+  selector:
+    k8s-app: traefik  
+  ports:
+    - protocol: TCP
+      port: 8380
+      targetPort: 8380
+      name: http-metrics
+  type: ClusterIP
+  clusterIP: None
