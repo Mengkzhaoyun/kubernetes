@@ -5,8 +5,8 @@ externalProtocol: https
 externalDomain: harbor.wodcloud.com
 # The Port for Harbor service, leave empty if the service 
 # is to be bound to port 80/443
-externalPort: 32700
-harborAdminPassword: 58772015
+externalPort: 
+harborAdminPassword: "58772015"
 authenticationMode: "db_auth"
 selfRegistration: "on"
 ldap:
@@ -30,17 +30,13 @@ email:
   identity: ""
 
 # The secret key used for encryption. Must be a string of 16 chars.
-secretKey: not-a-secure-key
+secretKey: "nQImBn5SVCHL7ehq"
 
 # These annotations allow the registry to work behind the nginx
 # ingress controller.
 ingress:
   enabled: true
   annotations:
-    ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    ingress.kubernetes.io/proxy-body-size: "0"
-    nginx.ingress.kubernetes.io/proxy-body-size: "0"
   tls:
     # Fill the secretName if you want to use the certificate of 
     # yourself when Harbor serves with HTTPS. A certificate will 
@@ -52,12 +48,12 @@ harborImageTag: &harbor_image_tag dev
 
 adminserver:
   image:
-    repository: goharbor/harbor-adminserver
+    repository: registry-vpc.cn-qingdao.aliyuncs.com/wod/harbor-adminserver
     tag: *harbor_image_tag
     pullPolicy: IfNotPresent
   volumes:
     config:
-      # storageClass: "-"
+      storageClass: "fast"
       accessMode: ReadWriteOnce
       size: 1Gi
   # resources:
@@ -70,10 +66,10 @@ adminserver:
 
 jobservice:
   image:
-    repository: goharbor/harbor-jobservice
+    repository: registry-vpc.cn-qingdao.aliyuncs.com/wod/harbor-jobservice
     tag: *harbor_image_tag
     pullPolicy: IfNotPresent
-  secret: not-a-secure-secret
+  secret: "BBRQwySksiHZqJUh"
   maxWorkers: 50
 # resources:
 #   requests:
@@ -85,10 +81,10 @@ jobservice:
 
 ui:
   image:
-    repository: goharbor/harbor-ui
+    repository: registry-vpc.cn-qingdao.aliyuncs.com/wod/harbor-ui
     tag: *harbor_image_tag
     pullPolicy: IfNotPresent
-  secret: not-a-secure-secret
+  secret: "BBRQwySksiHZqJUh"
 # resources:
 #  requests:
 #    memory: 256Mi
@@ -104,14 +100,14 @@ database:
   type: internal
   internal:
     image:
-      repository: goharbor/harbor-db
+      repository: registry-vpc.cn-qingdao.aliyuncs.com/wod/harbor-db
       tag: *harbor_image_tag
       pullPolicy: IfNotPresent
     # the superuser password of database
-    password: "changeit"
+    password: "abc58772015"
     volumes:
       data:
-        # storageClass: "-"
+        storageClass: "fast"
         accessMode: ReadWriteOnce
         size: 1Gi
     # resources:
@@ -133,10 +129,10 @@ database:
 
 registry:
   image:
-    repository: goharbor/registry-photon
+    repository: registry-vpc.cn-qingdao.aliyuncs.com/wod/registry-photon
     tag: dev
     pullPolicy: IfNotPresent
-  httpSecret: not-a-secure-secret
+  httpSecret: "BBRQwySksiHZqJUh"
   logLevel: info
   storage:
     # specify the type of storage: "filesystem", "azure", "gcs", "s3", "swift", 
@@ -217,12 +213,12 @@ registry:
 chartmuseum:
   enabled: true
   image:
-    repository: goharbor/chartmuseum-photon
+    repository: registry-vpc.cn-qingdao.aliyuncs.com/wod/chartmuseum-photon
     tag: dev
     pullPolicy: IfNotPresent
   volumes:
     data:
-      # storageClass: "-"
+      storageClass: "fast"
       accessMode: ReadWriteOnce
       size: 5Gi
   # resources:
@@ -236,12 +232,12 @@ chartmuseum:
 clair:
   enabled: true
   image:
-    repository: goharbor/clair-photon
+    repository: registry-vpc.cn-qingdao.aliyuncs.com/wod/clair-photon
     tag: dev
     pullPolicy: IfNotPresent
   volumes:
     pgData:
-      # storageClass: "-"
+      storageClass: "fast"
       accessMode: ReadWriteOnce
       size: 1Gi
   # resources:
@@ -257,7 +253,7 @@ redis:
   # and fill the connection informations in "external" section.
   # or the internal Redis will be used
   usePassword: false
-  password: "changeit"
+  password: "abc58772015"
   cluster:
     enabled: false
   master:
@@ -271,18 +267,18 @@ redis:
     port: "6379"
     databaseIndex: "0"
     usePassword: false
-    password: "changeit"
+    password: "abc58772015"
 
 notary:
   enabled: true
   server:
     image:
-      repository: goharbor/notary-server-photon
+      repository: registry-vpc.cn-qingdao.aliyuncs.com/wod/notary-server-photon
       tag: dev
       pullPolicy: IfNotPresent
   signer:
     image:
-      repository: goharbor/notary-signer-photon
+      repository: registry-vpc.cn-qingdao.aliyuncs.com/wod/notary-signer-photon
       tag: dev
       pullPolicy: IfNotPresent
     env:

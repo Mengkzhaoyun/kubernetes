@@ -1,0 +1,30 @@
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: hostpath
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: hostpath
+  resources:
+    requests:
+      storage: 1Mi
+---
+kind: Pod
+apiVersion: v1
+metadata:
+  name: hostpath-test-pod
+spec:
+  containers:
+  - name: hostpath-test-container
+    image: registry-vpc.cn-qingdao.aliyuncs.com/wod/busybox:1.24
+    command: ["/bin/sh", "-c", "while true; do date >> /mnt/dates; sleep 10; done"]
+    volumeMounts:
+      - name: hostpath-volume
+        mountPath: "/mnt"
+  restartPolicy: "Never"
+  volumes:
+    - name: hostpath-volume
+      persistentVolumeClaim:
+        claimName: hostpath 

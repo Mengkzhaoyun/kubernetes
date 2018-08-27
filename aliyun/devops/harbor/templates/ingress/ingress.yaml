@@ -8,17 +8,17 @@ metadata:
   annotations:
 {{ toYaml .Values.ingress.annotations | indent 4 }}
 spec:
-{{ if eq .Values.externalProtocol "https" }}
-  tls:
-  - hosts:
-    - "{{ .Values.externalDomain }}"
-    - "{{ template "harbor.notaryFQDN" . }}"
-    {{ if eq .Values.ingress.tls.secretName "" }}
-    secretName: "{{ template "harbor.fullname" . }}-ingress"
-    {{ else }}
-    secretName: {{ .Values.ingress.tls.secretName }}
-    {{ end }}
-{{ end }}
+# {{ if eq .Values.externalProtocol "https" }}
+#   tls:
+#   - hosts:
+#     - "{{ .Values.externalDomain }}"
+#     - "{{ template "harbor.notaryFQDN" . }}"
+#     {{ if eq .Values.ingress.tls.secretName "" }}
+#     secretName: "{{ template "harbor.fullname" . }}-ingress"
+#     {{ else }}
+#     secretName: {{ .Values.ingress.tls.secretName }}
+#     {{ end }}
+# {{ end }}
   rules:
   - host: "{{ .Values.externalDomain }}"
     http:
