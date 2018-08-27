@@ -102,6 +102,9 @@ spec:
       - name: registry-config
         configMap:
           name: "{{ template "harbor.fullname" . }}-registry"
+      - name: registry-data
+        hostPath:
+          path: /etc/kubernetes/data/registry          
     {{- with .Values.registry.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
@@ -114,22 +117,3 @@ spec:
       tolerations:
 {{ toYaml . | indent 8 }}
     {{- end }}
-  {{- if (.Values.persistence.enabled) and eq .Values.registry.storage.type "filesystem" }}
-  volumeClaimTemplates:
-  - metadata:
-      name: registry-data
-      labels:
-{{ include "harbor.labels" . | indent 8 }}
-    spec:
-      accessModes: [{{ .Values.registry.volumes.data.accessMode | quote }}]
-      {{- if .Values.registry.volumes.data.storageClass }}
-      {{- if (eq "-" .Values.registry.volumes.data.storageClass) }}
-      storageClassName: ""
-      {{- else }}
-      storageClassName: "{{ .Values.registry.volumes.data.storageClass }}"
-      {{- end }}
-      {{- end }}
-      resources:
-        requests:
-          storage: {{ .Values.registry.volumes.data.size | quote }}
-  {{- end }}

@@ -16,6 +16,8 @@ apiVersion: v1
 metadata:
   name: hostpath-test-pod
 spec:
+  nodeSelector:
+    kubernetes.io/hostname: 172.31.14.42
   containers:
   - name: hostpath-test-container
     image: registry-vpc.cn-qingdao.aliyuncs.com/wod/busybox:1.24

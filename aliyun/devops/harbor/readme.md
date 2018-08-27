@@ -39,11 +39,17 @@ docker push registry-vpc.cn-qingdao.aliyuncs.com/wod/registry:2.6.2
 docker pull nginx:1.15.2-alpine && \
 docker tag nginx:1.15.2-alpine  registry-vpc.cn-qingdao.aliyuncs.com/wod/nginx:1.15.2-alpine  && \
 docker push registry-vpc.cn-qingdao.aliyuncs.com/wod/nginx:1.15.2-alpine 
+
+docker pull redis:4.0.1-alpine && \
+docker tag redis:4.0.1-alpine  registry-vpc.cn-qingdao.aliyuncs.com/wod/redis:4.0.1-alpine  && \
+docker push registry-vpc.cn-qingdao.aliyuncs.com/wod/redis:4.0.1-alpine
 ```
 
 # setup
 ```powershell
 # 1.template
-cd C:\Go\src\github.com\mengkzhaoyun\kubernetes\aliyun\devops\harbor ;`
-helm template . --name harbor --namespace devops > ./dist/harbor.yaml
+cd /etc/kubernetes/helm/harbor && helm template . --name harbor --namespace devops > ./dist/harbor.yaml
+
+# 2.helm install
+cd /etc/kubernetes/helm/harbor && helm install . --name harbor --namespace devops
 ```

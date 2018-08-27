@@ -13,7 +13,7 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 */}}
 {{- define "harbor.fullname" -}}
 {{- $name := default "harbor" .Values.nameOverride -}}
-{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{- printf "%s" .Release.Name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/* Helm required labels */}}
@@ -146,7 +146,7 @@ postgres://{{ template "harbor.database.username" . }}:{{ template "harbor.datab
   {{- if .Values.redis.external.enabled -}}
     {{- .Values.redis.external.host -}}
   {{- else -}}
-    {{- .Release.Name }}-redis-master
+    {{- .Release.Name }}-redis
   {{- end -}}
 {{- end -}}
 
@@ -154,7 +154,7 @@ postgres://{{ template "harbor.database.username" . }}:{{ template "harbor.datab
   {{- if .Values.redis.external.enabled -}}
     {{- .Values.redis.external.port -}}
   {{- else -}}
-    {{- .Values.redis.master.port }}
+    6379
   {{- end -}}
 {{- end -}}
 

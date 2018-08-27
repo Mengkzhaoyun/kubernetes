@@ -1,0 +1,24 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "harbor.fullname" . }}-redis
+  labels:
+{{ include "harbor.labels" . | indent 4 }}
+    component: redis
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+{{ include "harbor.labels" . | indent 8 }}
+        component: redis
+    spec:
+      containers:
+      - name: redis
+        image: {{ .Values.redis.image.repository }}:{{ .Values.redis.image.tag }}
+        imagePullPolicy: {{ .Values.redis.image.pullPolicy }}
+        args: ["--save","''","--appendonly","no"]
+        ports:
+        - name: redis
+          containerPort: 6379

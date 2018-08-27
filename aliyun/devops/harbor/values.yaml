@@ -206,7 +206,8 @@ registry:
   #  requests:
   #    memory: 256Mi
   #    cpu: 100m
-  nodeSelector: {}
+  nodeSelector: 
+    kubernetes.io/hostname: 172.31.14.41
   tolerations: []
   affinity: {}
 
@@ -249,6 +250,10 @@ clair:
   affinity: {}
 
 redis:
+  image:
+    repository: registry-vpc.cn-qingdao.aliyuncs.com/wod/redis
+    tag: 4.0.1-alpine
+    pullPolicy: IfNotPresent
   # if external Redis is used, set "external.enabled" to "true"
   # and fill the connection informations in "external" section.
   # or the internal Redis will be used
