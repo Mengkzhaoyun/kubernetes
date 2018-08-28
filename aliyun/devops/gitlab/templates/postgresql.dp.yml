@@ -2,7 +2,7 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: {{ .Release.Name }}-postgresql
-  namespace: {{ .Release.NameSpace }}
+  namespace: {{ .Release.Namespace }}
 spec:
   replicas: 1
   template:

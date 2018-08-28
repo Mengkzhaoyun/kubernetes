@@ -1,0 +1,56 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: drone-server
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: drone-server
+        version: "{{ .Values.drone.server.image.tag }}"
+    spec:
+      containers:
+      - name: drone-server
+        image: "{{ .Values.drone.server.image.repository }}:{{ .Values.drone.server.image.tag }}"
+        ports:
+        - containerPort: 8000
+        - containerPort: 9000
+        volumeMounts:
+        - name: sqlite
+          mountPath: /var/lib/drone
+        - name: src
+          mountPath: /drone/src
+        - name: secret
+          mountPath: /drone/secrets
+        securityContext:
+          privileged: true
+        envFrom:
+        - configMapRef:
+            name: "drone"          
+        env:
+        - name: DRONE_OPEN
+          value: "true"
+        - name: DRONE_GITLAB
+          value: "true"
+        - name: GIN_MODE
+          value: "release"          
+        - name: DRONE_SECRET
+          value: passwddrone
+        - name: DRONE_GLOBAL_SECRETS
+          value: /drone/secrets/global.json
+      volumes:      
+      - name: sqlite
+        persistentVolumeClaim:
+          claimName: drone-server
+      - name: src
+        hostPath:
+          path: /data/{{ .Release.Namespace }}/drone/src
+      - name: secret
+        configMap:
+          name: drone-conf
+          items:
+          - key: config
+            path: global.json     

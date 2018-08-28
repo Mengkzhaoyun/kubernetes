@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: drone
+  namespace: {{ .Release.Namespace }}
+data:
+  DRONE_HOST: "https://{{ .Values.drone.server.host }}"
+  DRONE_ADMIN: "docker"  
+  DRONE_GITLAB_URL: "{{ .Values.gitlab.host }}"
+  DRONE_GITLAB_CLIENT: "{{ .Values.gitlab.client }}"
+  DRONE_GITLAB_SECRET: "{{ .Values.gitlab.secret }}"
+  DRONE_GITLAB_GIT_USERNAME: "docker"
+  DRONE_GITLAB_GIT_PASSWORD: "58772015"

@@ -1,0 +1,34 @@
+---
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: drone-agent
+  namespace: {{ .Release.Namespace }}
+spec:
+  template:
+    metadata:
+      labels:
+        app: drone-agent
+        version: "{{ .Values.drone.agent.image.tag }}"
+    spec:
+      containers:
+      - name: drone-agent
+        image: "{{ .Values.drone.agent.image.repository }}:{{ .Values.drone.agent.image.tag }}"
+        volumeMounts:
+        - name: docker
+          mountPath: /var/run/docker.sock
+        securityContext:
+          privileged: true
+        env:
+        - name: DRONE_SERVER
+          value: drone-server:9000
+        - name: DRONE_SECRET
+          value: passwddrone
+        - name: DRONE_HOSTNAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+      volumes:      
+      - name: docker
+        hostPath:
+          path: /var/run/docker.sock
